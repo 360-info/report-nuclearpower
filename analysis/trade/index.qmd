@@ -1,0 +1,121 @@
+---
+title: Untitled
+subtitle: A slightly longer title
+format:
+  360-analysis-html: default
+author: James Goldie
+date: last-modified
+code-fold: true
+---
+
+## Introduction
+
+
+```{r}
+#| label: setup
+library(tidyverse)
+library(here)
+```
+
+
+```{r}
+#| label: download
+
+base_url <-
+  "https://cidportal.jrc.ec.europa.eu/ftp/jrc-opendata/NUCLEAR-TRADE-ATLAS/"
+dest_path <- here("data", "raw")
+
+files <- tibble(
+  file = c(
+    "NUCLEAR_TRADE_ATLAS_DATA_2023.zip",
+    "NUCLEAR_TRADE_ATLAS_DATA_2022.zip"),
+  url = paste0(base_url, file),
+  dest = file.path(dest_path, file))
+
+# download and unzip the files if the csvs don't exist
+if (!all(file.exists(files$dest))) {
+  dir.create(dest_path, showWarnings = FALSE)
+  files |>
+    mutate(
+      dl = walk2(url, dest, download.file),
+      unzip = walk(dest, unzip, exdir = dest_path))
+}
+```
+
+Let's open the two files up:
+
+```{r}
+#| label: open-data
+tibble(
+  path = list.files(dest_path, pattern = glob2rx("*.csv"), full.names = TRUE)) |>
+  mutate(data = map(path, read_csv)) |>
+  unnest(data) |>
+  janitor::clean_names() ->
+all_data
+```
+
+Nigel Marks from Curtin University has helped us classify the commodities described in the `commodity_code`, `commodity_description` and `nuclear_commodity_description` columns.
+
+```{r}
+#| label: categories
+here("data", "nuclear-commodity-categories.csv") |>
+  read_csv() |>
+  print() |>
+  select(-nuclear_commodity_description) ->
+categories
+```
+
+We'll have a look at the commodities marked "Ignore" as well to see how they big they are, but we're approaching on the assumption that they're mostly not related to fission.
+
+Let's merge those categories in:
+
+```{r}
+#| label: merge-categories
+all_data |>
+  left_join(categories, join_by(commodity_code), multiple = "all",
+    unmatched = "error") |>
+  glimpse() ->
+joined_data
+```
+
+We'll also rearrange the countries slightly. In Comtrade, the database from which this Atlas is derived:
+
+- **exports** are trades from the reporter to the partner (ie. the reporter in the source and the partner is the recipient), while
+- **imports** go from the partner to the reporter (ie. the reporter is the recipient and the partner is the source).
+
+Let's derive the `source` and `recipient`:
+
+```{r}
+joined_data |>
+  mutate(
+    source = if_else(flow == "Export", reporter, partner),
+    source_iso3 = if_else(flow == "Export", reporter_iso3, partner_iso3),
+    recipient = if_else(flow == "Export", partner, reporter),
+    recipient_iso3 = if_else(flow == "Export", partner_iso3, reporter_iso3)) ->
+mapped_data
+```
+
+Now we'll sum up commodities within each category (still split by year and by trading partners):
+
+```{r}
+#| aggregate-commodities
+mapped_data |>
+  # lump all the "ignore" categories together
+  mutate(category = if_else(
+    str_detect(category, fixed("ignore", ignore_case = TRUE)),
+    "Ignore",
+    category)) |>
+  # all period dates are dec 31 for that year
+  mutate(year = year(mdy(period))) |>
+  # sum up all commodities within category
+  group_by(source, source_iso3, recipient, recipient_iso3, year, category, flow) |>
+  summarise(
+    value_usd = sum(value_usd, na.rm = TRUE)) |>
+  ungroup() |>
+  write_csv(here("data", "nuclear-commodity-data.csv")) ->
+category_data
+
+category_data |> View()
+```
+
+Finally, we need to merge country centroids in.

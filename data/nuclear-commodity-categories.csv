@@ -1,0 +1,23 @@
+﻿commodity_code,nuclear_commodity_description,category
+2844.4,Radioactive elements and isotopes,Unclear - perhaps ignore
+8401.3,"Fuel elements, non-irradiated",Fuel fabrication
+8101.99,Tungsten articles,Ignore - probably related to fusion
+8112.12,Beryllium,Probably ignore
+8112.13,Beryllium,Probably ignore
+8112.19,Beryllium,Probably ignore
+2844.3,Depleted uranium; thorium,Enrichment
+2844.2,Enriched uranium; plutonium,Enrichment
+2845.1,Heavy water,Power Plant
+2844.5,Irradiated fuel elements,Spent Fuel / HLW
+8401.2,Machinery and apparatus for isotopic separation,Enrichment
+8104.11,"Magnesium, high purity",Fuel fabrication
+2844.1,Natural uranium,Mining
+7504,Nickel powder,Power Plant 
+8401.1,Nuclear reactors and parts,Power Plant
+8401.4,Nuclear reactors and parts,Power Plant
+8103.9,Tantalum articles,Ignore - probably related to fusion
+2612.2,Thorium ores and concentrates,Mining
+2612.1,Uranium ores and concentrates,Mining
+8109.2,Zirconium,Fuel fabrication
+8109.9,Zirconium,Fuel fabrication
+8109.3,Zirconium,Fuel fabrication

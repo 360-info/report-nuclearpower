@@ -27,7 +27,8 @@
 		},
 		/* add additional r packages here */
 		"ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-			"packages": "github::rstudio/renv,tidyverse,here,httpgd,janitor,github::360-info/themes360info"
+			"additionalRepositories": "nx10 = 'https://nx10.r-universe.dev'",
+			"packages": "github::rstudio/renv,tidyverse,here,httpgd,janitor,github::360-info/themes360info,countrycode"
 		}
 	},
 
