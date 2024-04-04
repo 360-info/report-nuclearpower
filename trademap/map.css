@@ -10,3 +10,39 @@
 .maplibregl-ctrl-attrib-button {
   display: none;
 }
+
+#category-filter {
+  position: absolute;
+  top: 0;
+  right: 8px;
+  padding: 16px 8px;
+}
+
+#category-filter form > div {
+  display: flex;
+  flex-flow: column;
+  text-transform: uppercase;
+  font-size: clamp(0.5em, 1.5vw, 2.0em);
+  align-items: end;
+  background-color: #11111166;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+/* #category-filter form > div > label {
+
+} */
+
+#category-filter form input {
+  visibility: hidden;
+}
+
+#category-filter form input:checked + span {
+  font-weight: bold;
+  margin-inline-end: -1.25em;
+}
+
+#category-filter form input:checked + span::after {
+  content: '←';
+  padding-inline-start: 4px;
+}

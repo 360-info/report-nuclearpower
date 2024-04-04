@@ -53,7 +53,7 @@ deck = r("deck")
 
 import { aq, op } from "@uwdata/arquero"
 ```
-
+ 
 ```{ojs}
 //| label: load-filter-data
 centroids = aq.loadCSV("/data/nuclear-commodity-centroids.csv")
@@ -75,13 +75,14 @@ mergedData = allData
       suffix: ["", "_recipient"]
     })
   .objects()
-```
+``` 
 
 ```{ojs}
 //| label: category-filter
 viewof selectedCategory = Inputs.radio(
   Array.from(new Set(mergedData.map(d => d.category))), {
-    value: "Mining"
+    value: "Mining",
+    format: x => html`<span style="color: ${colorSchemes[x][3]}">${x}</span>`
   }
 )
 categoryData = mergedData.filter(d => d.category == selectedCategory)
@@ -139,9 +140,6 @@ transferArcs = new deck.MapboxLayer({
     d => [Number(d.lon), Number(d.lat)],
   getTargetPosition:
     d => [Number(d.lon_recipient), Number(d.lat_recipient)],
-  // TODO - change colours based on commodity category
-  // getSourceColor: d => [...defaultScheme[7], opacityScale(d.value_usd)],
-  // getTargetColor: d => [...defaultScheme[3], opacityScale(d.value_usd)],
   getWidth: d => widthScale(d.value_usd),
   getTilt: d => Number(d.lon) > Number(d.lon_recipient) ? 0 : -5,
   pickable: true,
@@ -222,8 +220,8 @@ viewof map = {
 //| label: update-arcs
 updates = transferArcs.setProps({
   data: categoryData,
-  getSourceColor: d => [...deckColorScheme[7], opacityScale(d.value_usd)],
-  getTargetColor: d => [...deckColorScheme[3], opacityScale(d.value_usd)]
+  getSourceColor: d => [...deckColorScheme[6], opacityScale(d.value_usd)],
+  getTargetColor: d => [...deckColorScheme[2], opacityScale(d.value_usd)]
 })
 ```
 
