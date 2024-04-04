@@ -1,0 +1,12 @@
+#map .maplibregl-map {
+  width: calc(100svw - 16px);
+  height: 80svw;
+  overflow: hidden;
+  z-index: -1;
+  background-color: #111111;
+}
+
+/* we do attribution in our own footer */
+.maplibregl-ctrl-attrib-button {
+  display: none;
+}

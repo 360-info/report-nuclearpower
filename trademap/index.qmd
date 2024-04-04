@@ -18,8 +18,10 @@ resources:
   - tiles/*/*/*.pbf
   - font/*
   - font/*/*
+  - style.json
 format:
-  360-embed-html: default
+  360-embed-html:
+    css: map.css
 # metadata for modals and embed sharing functionality
 360embed:
   byline: James Goldie, 360info
@@ -33,33 +35,200 @@ format:
   repo: report-example
   domain: https://example.360visuals.org
   path: /map/  
-  fragments: state, month
+  fragments:
   about: |
     Here's a place to **tell people** and [link to things](https://example.com)!
 ---
-
+ 
 ```{ojs}
 //| label: setup
-
 r = require.alias({
   maplibregl: "maplibre-gl@2.1.9/dist/maplibre-gl.js",
   h3: {},
   deck: "deck.gl@8.9.35/dist.min.js"
-});
+})
 
-maplibregl = r("maplibregl").catch(() => window["maplibregl"]);
-deck = r("deck");
+maplibregl = r("maplibregl").catch(() => window["maplibregl"])
+deck = r("deck")
+
+import { aq, op } from "@uwdata/arquero"
 ```
 
 ```{ojs}
-//| label: load-data
+//| label: load-filter-data
+centroids = aq.loadCSV("/data/nuclear-commodity-centroids.csv")
+allData = aq.loadCSV("/data/nuclear-commodity-data.csv")
 
-centroids = FileAttachment("/data/nuclear-commodity-centroids.csv")
-  .csv({ typed: true })
-allData = FileAttachment("/data/nuclear-commodity-data.csv")
-  .csv({ typed: true })
+// filter out ignored commodities, then join sources/recipients with centroids
+mergedData = allData
+  .filter(d => d.category != "Ignore")
+  .join(centroids,
+    ["source_iso3", "iso3"],
+    [[aq.all()], ["iso3", "lat", "lon"]],
+    {
+      suffix: ["", "_source"]
+    })
+  .join(centroids,
+    ["recipient_iso3", "iso3"],
+    [[aq.all()], ["iso3", "lat", "lon"]],
+    {
+      suffix: ["", "_recipient"]
+    })
+  .objects()
 ```
 
+```{ojs}
+//| label: category-filter
+viewof selectedCategory = Inputs.radio(
+  Array.from(new Set(mergedData.map(d => d.category))), {
+    value: "Mining"
+  }
+)
+categoryData = mergedData.filter(d => d.category == selectedCategory)
+```
+
+```{ojs}
+//| label: scales
+valueExtent = d3.extent(mergedData.map(d => d.value_usd))
+widthScale =
+  d3.scaleLog()
+  .domain(valueExtent)
+  .range([0.25, 2])
+opacityScale =
+  d3.scaleLog()
+  .domain(valueExtent)
+  .range([
+    opacities[selectedCategory] * 0.15 * 255,
+    opacities[selectedCategory] * 255])
+
+// we'll use a different colour scale for each category, taking a different lightness for source and recipient
+colorSchemes = ({
+  "Mining": d3.schemeYlOrBr[9],
+  "Enrichment": d3.schemeYlGn[9],
+  "Fuel fabrication": d3.schemeYlGnBu[9],
+  "Power Plant": d3.schemeGreys[9],
+  "Spent Fuel / HLW": d3.schemeRdPu[9]
+})
+
+opacities = ({
+  "Mining": 0.3,
+  "Enrichment": 0.3,
+  "Fuel fabrication": 0.3,
+  "Power Plant": 0.15,
+  "Spent Fuel / HLW": 0.45
+})
+
+// convert hexcode into deckgl's [r, g, b] format @ 25% opacity
+convertSchemeToDeck = (category) => {
+  return colorSchemes[category]
+    .map(d => d3.color(d))
+    .map(d => [d.r, d.g, d.b])
+}
+deckColorScheme = convertSchemeToDeck(selectedCategory)
+defaultScheme = convertSchemeToDeck("Mining")
+
+```
+
+```{ojs}
+//| label: arc-layer
+transferArcs = new deck.MapboxLayer({
+  id: "transferArcs", 
+  type: deck.ArcLayer,
+  data: [],
+  getSourcePosition:
+    d => [Number(d.lon), Number(d.lat)],
+  getTargetPosition:
+    d => [Number(d.lon_recipient), Number(d.lat_recipient)],
+  // TODO - change colours based on commodity category
+  // getSourceColor: d => [...defaultScheme[7], opacityScale(d.value_usd)],
+  // getTargetColor: d => [...defaultScheme[3], opacityScale(d.value_usd)],
+  getWidth: d => widthScale(d.value_usd),
+  getTilt: d => Number(d.lon) > Number(d.lon_recipient) ? 0 : -5,
+  pickable: true,
+  autoHighlight: true,
+  highlightColor: [255, 200, 0, 255]
+})
+```
+
+```{ojs}
+//| label: map
+
+viewof map = {
+  let container = html`<div></div>`;
+
+  yield container;
+
+  // Create the \`map\` object with the mapboxgl.Map constructor, referencing
+  // the container div
+  let map = new maplibregl.Map({
+    container,
+    bounds: [[-175, -80], [175, 85]],
+    pitch: 30,
+    antialias: true,
+    style: "style.json",
+    attribution: false
+  });
+
+  // on map load:
+  // - dispatch value back to ojs
+  // - add the deck.gl layer to the map
+  // - add a prop to the layer that adds/removes a popup from the map
+  //   (we can't do this on initial layer def because the map isn't ready yet)
+  map.on("load", () => {
+
+    // dispatch back to ojs
+    container.value = map;
+    container.dispatchEvent(new CustomEvent("input"));
+    
+    map.addLayer(transferArcs);
+
+    // function updatePopup(info, event) {
+    //   if (info && info.object) {
+    //     // TODO - set coordinates with event.center?
+        
+    //     // format the amount
+    //     const tivText =
+    //       info.object.value > 1000 ?
+    //         "$" + (info.object.value / 1000).toFixed(1) + " B" :
+    //         info.object.value > 0 ?
+    //           "$" + info.object.value + " M" :
+    //           "< $0.5 M";
+
+    //     popup
+    //       .setLngLat(info.coordinate)
+    //       .setHTML(
+    //         `<span class="title">${info.object.source} → ${info.object.recipient}</span></br>
+    //         TIV ${tivText} in ${info.object.year}</br>
+    //         <a href="#" data-micromodal-trigger="modal-about"><i class="bi bi-info-circle-fill"></i> What is TIV?</a>`)
+    //       .addTo(map);
+    //   } else {
+    //     popup.remove();
+    //   }
+    // }
+
+    // attach our hover updater to the layer (can't do this until after the
+    // layer is itself attached)
+    // transferArcs.setProps({ onHover: updatePopup });
+
+    // also configure the automatically-create deck instance
+    transferArcs.deck.setProps({ pickingRadius: 10 });
+    
+  });
+
+}
+```
+
+```{ojs}
+//| label: update-arcs
+updates = transferArcs.setProps({
+  data: categoryData,
+  getSourceColor: d => [...deckColorScheme[7], opacityScale(d.value_usd)],
+  getTargetColor: d => [...deckColorScheme[3], opacityScale(d.value_usd)]
+})
+```
+
+
+<!-- TODO - popup definition chunk -->
 
 
 {{< include _popups/_buttons.qmd >}}

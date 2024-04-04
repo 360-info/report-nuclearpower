@@ -15,18 +15,14 @@ a:visited {
 
 header#title-block-header {
   
-  color: black;
+  color: white;
   text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
   
   /* uncomment following for an inset header */
-  
-  /* position: absolute;
-  margin-right: 160px;
+  position: absolute;
   top: 0;
   left: 0;
-  padding: 10px;
-  z-index: 1000;  */
-
+  padding: 16px;
 }
 
 header#title-block-header h1,
