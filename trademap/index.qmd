@@ -12,10 +12,10 @@ resources:
   - /data/nuclear-commodity-centroids.csv
   - /data/nuclear-commodity-data.csv
   - example.png
-  - tiles/*
-  - tiles/*/*/*.pbf
-  - font/*
-  - font/*/*
+  - /assets/tiles/*
+  - /assets/tiles/*/*/*.pbf
+  - /assets/font/*
+  - /assets/font/*/*
   - style.json
 format:
   360-embed-html:

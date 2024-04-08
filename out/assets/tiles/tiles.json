@@ -67,6 +67,6 @@
         1
     ],
     "tiles": [
-        "https://nuclearenergy.360visuals.org/trademap/tiles/{z}/{x}/{y}.pbf"
+        "https://nuclearenergy.360visuals.org/assets/tiles/{z}/{x}/{y}.pbf"
     ]
 }
