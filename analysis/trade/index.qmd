@@ -1,6 +1,6 @@
 ---
-title: Untitled
-subtitle: A slightly longer title
+title: Trade of nuclear commodities
+subtitle: Tracking the commodities used to produce nuclear power
 format:
   360-analysis-html: default
 author: James Goldie
