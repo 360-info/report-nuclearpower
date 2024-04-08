@@ -35,9 +35,23 @@ format:
   path: /trademap/  
   fragments:
   about: |
-    The data in this map comes from the [Nuclear Trade Atlas](https://data.jrc.ec.europa.eu/dataset/1cbbf606-7ca0-43a6-abce-dbd37094a092) dataset produced by the [European Commission's Joint  Research Centre](https://ec.europa.eu/info/departments/joint-research-centre).
+    The data in this map comes from the [Nuclear Trade Atlas](https://data.jrc.ec.europa.eu/dataset/1cbbf606-7ca0-43a6-abce-dbd37094a092) dataset produced by the [European Commission's Joint  Research Centre](https://ec.europa.eu/info/departments/joint-research-centre).<br>
 
-    Commodities were classified into stages of the nuclear energy lifecycle with the help of Associate Professor [Nigel Marks](https://staffportal.curtin.edu.au/staff/profile/view/nigel-marks-a3025073/) from Curtin University.
+    Commodities were classified into stages of the nuclear energy lifecycle with the help of Associate Professor [Nigel Marks](https://staffportal.curtin.edu.au/staff/profile/view/nigel-marks-a3025073/) from Curtin University.<br>
+
+    Commodities traded in each category may (but do not necessarily) include:<br>
+
+    **Mining:** Natural uranium; and thorium ores and concentrates.<br>
+    
+    **Fuel fabrication:** Fuel elements, non-irradiated; magnesium, high purity; and zirconium.<br>
+    
+    **Enrichment:** Depleted uranium - thorium; enriched uranium - plutonium; and machinery and apparatus for isotopic separation.<br>
+    
+    **Power Plant:** Nickel powder; heavy water; and nuclear reactors and parts.<br>
+    
+    **Spent Fuel / High-Level Waste (HLW):** Irradiated fuel elements.<br>
+
+    Some items from the trade atlas were discarded as they were ruled more likely to be related to fusion.
 ---
 
 ::::{#title-block-header}
