@@ -10,7 +10,7 @@ open-graph:
   image: "/folder/example.png"
 resources:
   - /data/nuclear-commodity-centroids.csv
-  - /data/nuclear-commodity-data.csv
+  - /data/nuclear-commodity-data-allyears2023.csv
   - example.png
   - /assets/tiles/*
   - /assets/tiles/*/*/*.pbf
@@ -67,7 +67,7 @@ import { aq, op } from "@uwdata/arquero"
 ```{ojs}
 //| label: load-filter-data
 centroids = aq.loadCSV("/data/nuclear-commodity-centroids.csv")
-allData = aq.loadCSV("/data/nuclear-commodity-data.csv")
+allData = aq.loadCSV("/data/nuclear-commodity-data-allyears2023.csv")
 
 // filter out ignored commodities, then join sources/recipients with centroids
 mergedData = allData
@@ -101,12 +101,12 @@ categoryData = mergedData.filter(d => d.category == selectedCategory)
 ```{ojs}
 //| label: scales
 // width and opacity are both scaled logarithmically to help mid values stand
-// out
-valueExtent = d3.extent(mergedData.map(d => d.value_usd))
+// out. (note / 6 to express sum_value_usd as avg. across 6 years)
+valueExtent = d3.extent(mergedData.map(d => d.sum_value_usd / 6))
 widthScale =
   d3.scaleLog()
   .domain(valueExtent)
-  .range([0.25, 2])
+  .range([0.5, 2])
 opacityScale =
   d3.scaleLog()
   .domain(valueExtent)
@@ -126,11 +126,11 @@ sourceIndex = 7
 targetIndex = 1
  
 opacities = ({
-  "Mining": 0.25,
-  "Enrichment": 0.25,
-  "Fuel fabrication": 0.25,
-  "Power Plant": 0.1,
-  "Spent Fuel / HLW": 0.4
+  "Mining": 0.55,
+  "Enrichment": 0.55,
+  "Fuel fabrication": 0.55,
+  "Power Plant": 0.4,
+  "Spent Fuel / HLW": 0.7
 })
 
 // convert hexcode into deckgl's [r, g, b] format @ 25% opacity
@@ -154,7 +154,7 @@ transferArcs = new deck.MapboxLayer({
     d => [Number(d.lon), Number(d.lat)],
   getTargetPosition:
     d => [Number(d.lon_recipient), Number(d.lat_recipient)],
-  getWidth: d => widthScale(d.value_usd),
+  getWidth: d => widthScale(d.sum_value_usd / 6),
   getTilt: d => Number(d.lon) > Number(d.lon_recipient) ? 0 : -5,
   pickable: true,
   autoHighlight: true,
@@ -200,7 +200,7 @@ viewof map = {
         
     //     // format the amount
     //     const tivText =
-    //       info.object.value > 1000 ?
+    //       info.object.sum_value_usd > 1000 ?
     //         "$" + (info.object.value / 1000).toFixed(1) + " B" :
     //         info.object.value > 0 ?
     //           "$" + info.object.value + " M" :
@@ -234,8 +234,8 @@ viewof map = {
 //| label: update-arcs
 updates = transferArcs.setProps({
   data: categoryData,
-  getSourceColor: d => [...deckColorScheme[sourceIndex], opacityScale(d.value_usd)],
-  getTargetColor: d => [...deckColorScheme[targetIndex], opacityScale(d.value_usd)]
+  getSourceColor: d => [...deckColorScheme[sourceIndex], opacityScale(d.sum_value_usd)],
+  getTargetColor: d => [...deckColorScheme[targetIndex], opacityScale(d.sum_value_usd)]
 })
 ```
 

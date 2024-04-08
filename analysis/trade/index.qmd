@@ -26,9 +26,7 @@ base_url <-
 dest_path <- here("data", "raw")
 
 files <- tibble(
-  file = c(
-    "NUCLEAR_TRADE_ATLAS_DATA_2023.zip",
-    "NUCLEAR_TRADE_ATLAS_DATA_2022.zip"),
+  file = "NUCLEAR_TRADE_ATLAS_DATA_2023.zip",
   url = paste0(base_url, file),
   dest = file.path(dest_path, file))
 
@@ -116,14 +114,17 @@ mapped_data |>
   distinct(.keep_all = TRUE) |>
   write_csv(here("data", "nuclear-commodity-data.csv")) ->
 category_data
-
-category_data |> View()
 ```
 
-Finally, we need to get centroids for countries:
-
+Now let's sum it up across years, too:
 
 ```{r}
-#| label: get-centroids
+#| label: all-years
 
+category_data |>
+  group_by(source, source_iso3, recipient, recipient_iso3, category) |>
+  summarise(sum_value_usd = sum(value_usd, na.rm = TRUE)) |>
+  ungroup() |>
+  write_csv(here("data", "nuclear-commodity-data-allyears2023.csv")) ->
+allyears_data
 ```

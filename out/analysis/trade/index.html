@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="James Goldie">
-<meta name="dcterms.date" content="2024-04-03">
+<meta name="dcterms.date" content="2024-04-08">
 
 <title>Untitled</title>
 <style>
@@ -143,7 +143,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 3, 2024</p>
+      <p class="date">April 8, 2024</p>
     </div>
   </div>
   
@@ -191,20 +191,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>dest_path <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"raw"</span>)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="fu">c</span>(</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"NUCLEAR_TRADE_ATLAS_DATA_2023.zip"</span>,</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"NUCLEAR_TRADE_ATLAS_DATA_2022.zip"</span>),</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">url =</span> <span class="fu">paste0</span>(base_url, file),</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">dest =</span> <span class="fu">file.path</span>(dest_path, file))</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># download and unzip the files if the csvs don't exist</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">all</span>(<span class="fu">file.exists</span>(files<span class="sc">$</span>dest))) {</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(dest_path, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  files <span class="sc">|&gt;</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">dl =</span> <span class="fu">walk2</span>(url, dest, download.file),</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">unzip =</span> <span class="fu">walk</span>(dest, unzip, <span class="at">exdir =</span> dest_path))</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">"NUCLEAR_TRADE_ATLAS_DATA_2023.zip"</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">url =</span> <span class="fu">paste0</span>(base_url, file),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">dest =</span> <span class="fu">file.path</span>(dest_path, file))</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># download and unzip the files if the csvs don't exist</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">all</span>(<span class="fu">file.exists</span>(files<span class="sc">$</span>dest))) {</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(dest_path, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  files <span class="sc">|&gt;</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">dl =</span> <span class="fu">walk2</span>(url, dest, download.file),</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">unzip =</span> <span class="fu">walk</span>(dest, unzip, <span class="at">exdir =</span> dest_path))</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Let’s open the two files up:</p>
@@ -219,15 +217,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>all_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
-<pre><code>Rows: 95332 Columns: 13
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr (10): COMMODITY DESCRIPTION, FLOW, NUCLEAR COMMODITY DESCRIPTION, PARTNE...
-dbl  (3): COMMODITY CODE, QUANTITY KG, VALUE USD
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 96210 Columns: 13
+<pre><code>Rows: 96210 Columns: 13
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr (10): COMMODITY DESCRIPTION, FLOW, NUCLEAR COMMODITY DESCRIPTION, PARTNE...
@@ -286,23 +276,23 @@ dbl (1): commodity_code
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>joined_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Rows: 191,542
+<pre><code>Rows: 96,210
 Columns: 15
 $ path                          &lt;chr&gt; "/workspaces/report-nuclearpower/data/ra…
-$ commodity_code                &lt;dbl&gt; 2844.50, 2844.40, 2844.40, 2844.40, 8401…
-$ commodity_description         &lt;chr&gt; "Spent \"irradiated\" fuel elements \"ca…
+$ commodity_code                &lt;dbl&gt; 2844.40, 8401.30, 8101.99, 8101.99, 2844…
+$ commodity_description         &lt;chr&gt; "Radioactive elements, isotopes and comp…
 $ flow                          &lt;chr&gt; "Export", "Export", "Export", "Export", …
-$ nuclear_commodity_description &lt;chr&gt; "Irradiated fuel elements", "Radioactive…
-$ partner                       &lt;chr&gt; "Morocco", "Egypt", "Libya", "Morocco", …
-$ partner_iso2                  &lt;chr&gt; "MA", "EG", "LY", "MA", "SD", "CI", "SD"…
-$ partner_iso3                  &lt;chr&gt; "MAR", "EGY", "LBY", "MAR", "SDN", "CIV"…
-$ period                        &lt;chr&gt; "12/31/2016", "12/31/2016", "12/31/2016"…
-$ reporter                      &lt;chr&gt; "Tunisia", "Tunisia", "Tunisia", "Tunisi…
-$ reporter_iso2                 &lt;chr&gt; "TN", "TN", "TN", "TN", "EG", "MA", "EG"…
-$ reporter_iso3                 &lt;chr&gt; "TUN", "TUN", "TUN", "TUN", "EGY", "MAR"…
-$ quantity_kg                   &lt;dbl&gt; 76, 110, 63, 89, 1907, 153, 110, 130, 12…
-$ value_usd                     &lt;dbl&gt; 3133, 7210, 14291, 16087, 27517, 1910, 2…
-$ category                      &lt;chr&gt; "Spent Fuel / HLW", "Unclear - perhaps i…</code></pre>
+$ nuclear_commodity_description &lt;chr&gt; "Radioactive elements and isotopes", "Fu…
+$ partner                       &lt;chr&gt; "Libya", "Sudan", "Niger", "Ethiopia", "…
+$ partner_iso2                  &lt;chr&gt; "LY", "SD", "NE", "ET", "DZ", "EG", "MA"…
+$ partner_iso3                  &lt;chr&gt; "LBY", "SDN", "NER", "ETH", "DZA", "EGY"…
+$ period                        &lt;chr&gt; "12/31/2017", "12/31/2017", "12/31/2017"…
+$ reporter                      &lt;chr&gt; "Tunisia", "Egypt", "Algeria", "Egypt", …
+$ reporter_iso2                 &lt;chr&gt; "TN", "EG", "DZ", "EG", "ZA", "ZA", "ZA"…
+$ reporter_iso3                 &lt;chr&gt; "TUN", "EGY", "DZA", "EGY", "ZAF", "ZAF"…
+$ quantity_kg                   &lt;dbl&gt; 231, 0, 90, 1, 10, 272, 108, 100, 1, 968…
+$ value_usd                     &lt;dbl&gt; 69653, 30, 164, 32, 53930, 20071, 19889,…
+$ category                      &lt;chr&gt; "Unclear - perhaps ignore", "Fuel fabric…</code></pre>
 </div>
 </div>
 <p>We’ll also rearrange the countries slightly. In Comtrade, the database from which this Atlas is derived:</p>
@@ -350,12 +340,23 @@ $ category                      &lt;chr&gt; "Spent Fuel / HLW", "Unclear - perha
 'recipient_iso3', 'year', 'category'. You can override using the `.groups`
 argument.</code></pre>
 </div>
+</div>
+<p>Now let’s sum it up across years, too:</p>
+<div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>category_data <span class="sc">|&gt;</span> <span class="fu">View</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>category_data <span class="sc">|&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(source, source_iso3, recipient, recipient_iso3, category) <span class="sc">|&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">sum_value_usd =</span> <span class="fu">sum</span>(value_usd, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"nuclear-commodity-data-allyears2023.csv"</span>)) <span class="ot">-&gt;</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>allyears_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'source', 'source_iso3', 'recipient',
+'recipient_iso3'. You can override using the `.groups` argument.</code></pre>
 </div>
-<p>Finally, we need to get centroids for countries:</p>
+</div>
 
 
 </section>

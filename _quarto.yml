@@ -9,7 +9,7 @@ project:
   post-render: cp -f out/README.md README.md
   resources:
     - /data/nuclear-commodity-centroids.csv
-    - /data/nuclear-commodity-data.csv
+    - /data/nuclear-commodity-data-allyears2023.csv
     - /assets/font/*/*.pbf
     - /assets/tiles/*/*/*.pbf
     - /assets/tiles/*.json
