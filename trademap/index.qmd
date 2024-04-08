@@ -1,9 +1,7 @@
 ---
 # omit title and subtitle if you're doing a custom title block
-title: Untitled
-subtitle: A thing here
 # for social previews
-pagetitle: Untitled
+pagetitle: Nuclear trade
 description: A description for social previews
 twitter-card:
   site: "@360info_global"
@@ -25,20 +23,32 @@ format:
 # metadata for modals and embed sharing functionality
 360embed:
   byline: James Goldie, 360info
-  data-source: XXX
+  data-source: European Commission, Nigel Marks
   type: map
   aspect-ratio: 20 / 19
   min-height: 500px
   max-height: 893px
   bg-colour: white
-  title: "Interactive: title"
+  title: "Map: Nuclear trade"
   repo: report-example
-  domain: https://example.360visuals.org
-  path: /map/  
+  domain: https://nuclearenergy.360visuals.org
+  path: /trademap/  
   fragments:
   about: |
-    Here's a place to **tell people** and [link to things](https://example.com)!
+    The data in this map comes from the [Nuclear Trade Atlas](https://data.jrc.ec.europa.eu/dataset/1cbbf606-7ca0-43a6-abce-dbd37094a092) dataset produced by the [European Commission's Joint  Research Centre](https://ec.europa.eu/info/departments/joint-research-centre).
+
+    Commodities were classified into stages of the nuclear energy lifecycle with the help of Associate Professor [Nigel Marks](https://staffportal.curtin.edu.au/staff/profile/view/nigel-marks-a3025073/) from Curtin University.
 ---
+
+:::{#title-block-header}
+
+```{ojs}
+html`<h1><span style="color: white; padding-inline: 0.2em; border-radius: 0.3em; background-color: ${colorSchemes[selectedCategory][sourceIndex]};">Suppliers</span> and <span style="color: ${colorSchemes[selectedCategory][targetIndex]};">recipients</span></h1>`
+
+md`of nuclear power ${selectedCategory.toLowerCase()} commodities`
+```
+
+:::
  
 ```{ojs}
 //| label: setup
@@ -90,6 +100,8 @@ categoryData = mergedData.filter(d => d.category == selectedCategory)
 
 ```{ojs}
 //| label: scales
+// width and opacity are both scaled logarithmically to help mid values stand
+// out
 valueExtent = d3.extent(mergedData.map(d => d.value_usd))
 widthScale =
   d3.scaleLog()
@@ -99,7 +111,7 @@ opacityScale =
   d3.scaleLog()
   .domain(valueExtent)
   .range([
-    opacities[selectedCategory] * 0.15 * 255,
+    opacities[selectedCategory] * 0.65 * 255,
     opacities[selectedCategory] * 255])
 
 // we'll use a different colour scale for each category, taking a different lightness for source and recipient
@@ -110,13 +122,15 @@ colorSchemes = ({
   "Power Plant": d3.schemeGreys[9],
   "Spent Fuel / HLW": d3.schemeRdPu[9]
 })
-
+sourceIndex = 7
+targetIndex = 1
+ 
 opacities = ({
-  "Mining": 0.3,
-  "Enrichment": 0.3,
-  "Fuel fabrication": 0.3,
-  "Power Plant": 0.15,
-  "Spent Fuel / HLW": 0.45
+  "Mining": 0.25,
+  "Enrichment": 0.25,
+  "Fuel fabrication": 0.25,
+  "Power Plant": 0.1,
+  "Spent Fuel / HLW": 0.4
 })
 
 // convert hexcode into deckgl's [r, g, b] format @ 25% opacity
@@ -220,8 +234,8 @@ viewof map = {
 //| label: update-arcs
 updates = transferArcs.setProps({
   data: categoryData,
-  getSourceColor: d => [...deckColorScheme[6], opacityScale(d.value_usd)],
-  getTargetColor: d => [...deckColorScheme[2], opacityScale(d.value_usd)]
+  getSourceColor: d => [...deckColorScheme[sourceIndex], opacityScale(d.value_usd)],
+  getTargetColor: d => [...deckColorScheme[targetIndex], opacityScale(d.value_usd)]
 })
 ```
 

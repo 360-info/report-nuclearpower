@@ -113,13 +113,15 @@
   display: flex;
   flex-flow: row wrap;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   padding-top: 0.5em;
 
   font-size: 80%;
   border-top: 1px solid #00000088;
   color: #00000088;
+
+  margin-top: 8px;
 
   /* to maintain readability over a map */
   z-index: 1000;

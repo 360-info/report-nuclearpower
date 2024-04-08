@@ -1,9 +1,14 @@
+body {
+  margin: 0;
+}
+
 #map .maplibregl-map {
-  width: calc(100svw - 16px);
+  width: 100%;
   height: 80svw;
+  max-height: 94svh;
   overflow: hidden;
   z-index: -1;
-  background-color: #111111;
+  background-color: #031f16;
 }
 
 /* we do attribution in our own footer */
@@ -14,8 +19,12 @@
 #category-filter {
   position: absolute;
   top: 0;
-  right: 8px;
-  padding: 16px 8px;
+  right: 0;
+  padding: 16px 0;
+}
+
+#category-filter form {
+  padding-inline-end: 1em;
 }
 
 #category-filter form > div {
@@ -24,17 +33,19 @@
   text-transform: uppercase;
   font-size: clamp(0.5em, 1.5vw, 2.0em);
   align-items: end;
-  background-color: #11111166;
+  background-color: #031f1666;
   border-radius: 8px;
-  padding: 8px;
+  padding: 4px 8px;
 }
 
-/* #category-filter form > div > label {
-
-} */
-
 #category-filter form input {
-  visibility: hidden;
+  width: 0;
+  height: 0;
+}
+
+#category-filter form input:focus + span {
+  text-decoration: underline dotted;
+  text-underline-offset: 0.25em;
 }
 
 #category-filter form input:checked + span {
