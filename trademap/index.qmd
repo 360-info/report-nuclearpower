@@ -25,9 +25,9 @@ format:
   byline: James Goldie, 360info
   data-source: European Commission, Nigel Marks
   type: map
-  aspect-ratio: 20 / 19
-  min-height: 500px
-  max-height: 893px
+  aspect-ratio: 10 / 9
+  min-height: 350px
+  max-height: 900px
   bg-colour: white
   title: "Map: Nuclear trade"
   repo: report-example
