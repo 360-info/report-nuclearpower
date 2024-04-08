@@ -1,0 +1,149 @@
+---
+title: Use of nuclear energy
+subtitle: Which countries produce the most nuclear power?
+format:
+  360-analysis-html: default
+author: James Goldie
+date: last-modified
+code-fold: true
+---
+
+```{r}
+#| label: setup
+library(tidyverse)
+# library(glue)
+# library(sf)
+# library(rgeoboundaries)
+library(countrycode)
+# library(lwgeom)
+# library(jsonlite)
+library(here)
+```
+
+The data here is from the [International Renewable Energy Agency](https://irena.org).
+
+The tables (which can be updated by downloading them from [IRENASTAT](https://pxweb.irena.org/pxweb/en/IRENASTAT) and placing them in `data` as `irena-src-[measure][grid_status].csv`) are:
+
+* Installed electricity capacity by country/area (MW) by Country/area, Technology, Grid connection and Year
+* Electricity generation (GWh) by Country/area, Technology, Grid connection and Year
+
+```{r}
+#| label: irenastat-patch
+tibble(
+  path = list.files(here("data"), full.names = TRUE,
+    pattern = glob2rx("irena-src-*.csv")),
+  filename = basename(path)) |>
+  mutate(
+    data = map(path, read_csv,
+      skip = 3,
+      col_names = c("country", "tech", "grid", "year", "value"),
+      col_types = "cccid",
+      na = c("", "NA", ".."))) |>
+  separate(filename,
+    into = c("irena", "src", "measure", "grid", "ext"), sep = "[-.]") |>
+  select(measure, data) |>
+  unnest(data) ->
+irena_bound
+```
+
+We're going to classify these sources as either Nuclear, renewable or non-renewable.
+
+```{r}
+#| label: classify-sources
+irena_bound |>
+  mutate(
+    energy_type = case_match(tech,
+      c(
+        "Solar photovoltaic",   "Solar thermal energy",
+        "Onshore wind energy",  "Offshore wind energy",
+        "Renewable hydropower", "Mixed Hydro Plants",
+        "Pumped storage",       "Marine energy",
+        "Solid biofuels",       "Renewable municipal waste",
+        "Liquid biofuels",      "Biogas",
+        "Geothermal energy") ~ "renewable",
+      "Nuclear" ~ "nuclear",
+      .default = "nonrenewable")) |>
+  # calculate the amount and proportion in each tech bucket
+  group_by(measure, country, year, energy_type) |>
+  summarise(amount = sum(value, na.rm = TRUE)) |>
+  mutate(prop = amount / sum(amount, na.rm = TRUE)) |>
+  ungroup() |>
+  # pivot out the amounts and proportions by tech type
+  mutate(measure = recode(measure,
+    "generation" = "totalgen.gwh", "capacity" = "totalcap.mw")) |>
+  pivot_wider(
+    id_cols = c(country, year),
+    names_from = c(measure, energy_type), names_sep = "_",
+    values_from = c(amount, prop)) ->
+irena_wide
+```
+
+Finally, we also need ISO codes and centroids for the new data. I'm going to use `nuclear-commodity-centroids`, which has country names and ISO3 codes.
+
+```{r}
+#| label: add-centroids
+
+here("data", "nuclear-commodity-centroids.csv") |>
+  read_csv() ->
+centroids
+
+irena_wide |>
+  left_join(centroids, join_by(country == name), multiple = "all",
+    unmatched = "drop") ->
+irena_centroids
+
+# check the unmatched countries
+irena_wide |>
+  anti_join(centroids, join_by(country == name)) ->
+unmatched
+
+unmatched |> pull(country) |> unique()
+```
+
+Okay, we have a lot of unmatched countries — 66! Matching using country name often goes askew 😅 Let's see if the `{countrycode}` package can do any better:
+
+
+```{r}
+#| label: countrycode-matches
+
+irena_wide |>
+  mutate(iso3_countrycode = countrycode(country, "country.name", "iso3c")) |>
+  filter(is.na(iso3_countrycode)) |>
+  select(country, iso3_countrycode) |>
+  distinct()
+```
+
+Countrycode warns about a few match failures (just a few now!), but these mostly appear to be the result of a text encoding error (ie. the source files aren't UTF-8).
+
+I'm having some trouble getting `purrr::map` to work with different encodings, so I might just patch these manually and move on. Let's also get rid of `(the)` and `(... of)`:
+
+```{r}
+#| label: add-centroids-countrycode
+irena_wide |>
+  mutate(
+    country = case_match(country,
+      "Cura�ao" ~ "Curacao" ,
+      "Saint Barth�lemy" ~ "Saint Barthélemy",
+      "T�rkiye" ~ "Turkey",
+      .default = country),
+    iso3_countrycode = countrycode(country, "country.name", "iso3c")) |>
+  left_join(centroids, join_by(iso3_countrycode == iso3), multiple = "all",
+    unmatched = "drop") |>
+  select(-name) |>
+  select(iso3_countrycode, country, lat, lon, year, everything()) ->
+irena_centroids
+```
+
+Still a few non-matches (15), but most of them are quite small and difficult to match. Let's write it out!
+
+```{r}
+#| label: write
+irena_centroids |>
+  write_csv(here("data", "irena-proportions.csv"))
+
+# and also the latest data only
+latest_year <- max(irena_centroids$year, na.rm = TRUE)
+irena_centroids |>
+  filter(year == max(year, na.rm = TRUE)) |>
+  write_csv(here("data", paste0("irena-proportions-", latest_year, ".csv")))
+```
