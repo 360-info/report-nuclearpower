@@ -2,7 +2,7 @@
 # omit title and subtitle if you're doing a custom title block
 # for social previews
 pagetitle: Nuclear trade
-description: A description for social previews
+description: Producing nuclear energy requires more than just fuel. See the flow of nuclear materials across the globe in this map.
 twitter-card:
   site: "@360info_global"
   image: "/folder/example.png"
