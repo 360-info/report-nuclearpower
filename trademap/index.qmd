@@ -40,7 +40,9 @@ format:
     Commodities were classified into stages of the nuclear energy lifecycle with the help of Associate Professor [Nigel Marks](https://staffportal.curtin.edu.au/staff/profile/view/nigel-marks-a3025073/) from Curtin University.
 ---
 
-:::{#title-block-header}
+::::{#title-block-header}
+
+:::{.header}
 
 ```{ojs}
 html`<h1><span style="color: white; padding-inline: 0.2em; border-radius: 0.3em; background-color: ${colorSchemes[selectedCategory][sourceIndex]};">Suppliers</span> and <span style="color: ${colorSchemes[selectedCategory][targetIndex]};">recipients</span></h1>`
@@ -49,6 +51,19 @@ md`of nuclear power ${selectedCategory.toLowerCase()} commodities`
 ```
 
 :::
+
+:::{.detail}
+
+```{ojs}
+mutable selectedTransfer = md`No transfer selected`
+mutable selectedValue = md``
+
+// md`${transfer}: ${value}`
+```
+
+:::
+
+::::
  
 ```{ojs}
 //| label: setup
@@ -106,12 +121,12 @@ valueExtent = d3.extent(mergedData.map(d => d.sum_value_usd / 6))
 widthScale =
   d3.scaleLog()
   .domain(valueExtent)
-  .range([0.5, 2])
+  .range([0.25, 4])
 opacityScale =
   d3.scaleLog()
   .domain(valueExtent)
   .range([
-    opacities[selectedCategory] * 0.65 * 255,
+    opacities[selectedCategory] * 0.25 * 255,
     opacities[selectedCategory] * 255])
 
 // we'll use a different colour scale for each category, taking a different lightness for source and recipient
@@ -181,11 +196,6 @@ viewof map = {
     attribution: false
   });
 
-  // on map load:
-  // - dispatch value back to ojs
-  // - add the deck.gl layer to the map
-  // - add a prop to the layer that adds/removes a popup from the map
-  //   (we can't do this on initial layer def because the map isn't ready yet)
   map.on("load", () => {
 
     // dispatch back to ojs
@@ -194,38 +204,30 @@ viewof map = {
     
     map.addLayer(transferArcs);
 
-    // function updatePopup(info, event) {
-    //   if (info && info.object) {
-    //     // TODO - set coordinates with event.center?
-        
-    //     // format the amount
-    //     const tivText =
-    //       info.object.sum_value_usd > 1000 ?
-    //         "$" + (info.object.value / 1000).toFixed(1) + " B" :
-    //         info.object.value > 0 ?
-    //           "$" + info.object.value + " M" :
-    //           "< $0.5 M";
-
-    //     popup
-    //       .setLngLat(info.coordinate)
-    //       .setHTML(
-    //         `<span class="title">${info.object.source} → ${info.object.recipient}</span></br>
-    //         TIV ${tivText} in ${info.object.year}</br>
-    //         <a href="#" data-micromodal-trigger="modal-about"><i class="bi bi-info-circle-fill"></i> What is TIV?</a>`)
-    //       .addTo(map);
-    //   } else {
-    //     popup.remove();
-    //   }
-    // }
-
-    // attach our hover updater to the layer (can't do this until after the
-    // layer is itself attached)
-    // transferArcs.setProps({ onHover: updatePopup });
+    // on arc hover, update the title text
+    // (note that si suffix swap giga => billions)
+    transferArcs.setProps({
+      onHover: (info) => {
+        if (info && info.object) {
+          const amountText =
+            d3.format("$.2s")(info.object.sum_value_usd)
+              .replace("G", "B")
+              .replace("P", "T")
+          mutable selectedTransfer =
+            md`${info.object.source} → ${info.object.recipient}`
+          mutable selectedValue =
+            html`US${amountText} / year<br><span class="small">average over 2016–2021</span>`
+        } else {
+          mutable selectedTransfer = md`No transfer selected`
+          mutable selectedValue = md``
+        }
+      }
+    })
 
     // also configure the automatically-create deck instance
     transferArcs.deck.setProps({ pickingRadius: 10 });
-    
-  });
+
+  })
 
 }
 ```
@@ -238,9 +240,6 @@ updates = transferArcs.setProps({
   getTargetColor: d => [...deckColorScheme[targetIndex], opacityScale(d.sum_value_usd)]
 })
 ```
-
-
-<!-- TODO - popup definition chunk -->
 
 
 {{< include _popups/_buttons.qmd >}}
