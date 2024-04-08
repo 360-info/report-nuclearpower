@@ -17,6 +17,8 @@ a:visited {
   
   color: white;
   text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+
+  margin-inline-end: 125px;
   
   /* uncomment following for an inset header */
   position: absolute;
@@ -51,7 +53,7 @@ a:visited {
 }
 
 .small {
-  font-size: 70%;
+  font-size: 80%;
 }
 
 /* shrink header elements at lower widths */

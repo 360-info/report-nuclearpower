@@ -25,9 +25,11 @@ body {
 
 #category-filter form {
   padding-inline-end: 1em;
+  justify-content: end;
 }
 
 #category-filter form > div {
+  width: auto;
   display: flex;
   flex-flow: column;
   text-transform: uppercase;
@@ -38,24 +40,53 @@ body {
   padding: 4px 8px;
 }
 
-#category-filter form input {
+#category-filter form input[type="radio"] {
   width: 0;
   height: 0;
 }
 
-#category-filter form input:focus + span {
+#category-filter form input[type="radio"]:focus + span {
   text-decoration: underline dotted;
   text-underline-offset: 0.25em;
 }
 
-#category-filter form input:checked + span {
+#category-filter form input[type="radio"]:checked + span {
   font-weight: bold;
   margin-inline-end: -1.25em;
 }
 
-#category-filter form input:checked + span::after {
+#category-filter form input[type="radio"]:checked + span::after {
   content: '←';
   padding-inline-start: 4px;
+}
+
+/* country box */
+
+#category-filter form input[type="text"] {
+  width: 150px;
+  margin-inline-end: 13px;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #3cb68e;
+  color: white;
+}
+
+@media(max-width: 400px) {
+  #category-filter form input[type="text"] {
+    width: 75px;
+  }
+}
+
+@media(max-width: 500px) {
+  #category-filter form input[type="text"] {
+    width: 100px;
+  }
+}
+
+#category-filter form input[type="text"]:focus {
+  outline: none;
+  border-bottom: 1px solid #7fffd4;
+  box-shadow: 0 5px 5px -3px #7FFFD455
 }
 
 /* popups */

@@ -110,7 +110,15 @@ viewof selectedCategory = Inputs.radio(
     format: x => html`<span style="color: ${colorSchemes[x][3]}">${x}</span>`
   }
 )
-categoryData = mergedData.filter(d => d.category == selectedCategory)
+
+viewof selectedCountry = Inputs.text({ 
+  placeholder: "Country name" });
+
+// filter displayed data based on both category and countries
+categoryData = mergedData.filter(d =>
+  d.category == selectedCategory &&
+  (d.source.toLowerCase().includes(selectedCountry.toLowerCase()) ||
+    d.recipient.toLowerCase().includes(selectedCountry.toLowerCase())))
 ```
 
 ```{ojs}
@@ -121,12 +129,12 @@ valueExtent = d3.extent(mergedData.map(d => d.sum_value_usd / 6))
 widthScale =
   d3.scaleLog()
   .domain(valueExtent)
-  .range([0.25, 4])
+  .range([0.25, 2.5])
 opacityScale =
   d3.scaleLog()
   .domain(valueExtent)
   .range([
-    opacities[selectedCategory] * 0.25 * 255,
+    opacities[selectedCategory] * 0.15 * 255,
     opacities[selectedCategory] * 255])
 
 // we'll use a different colour scale for each category, taking a different lightness for source and recipient
@@ -142,9 +150,9 @@ targetIndex = 1
  
 opacities = ({
   "Mining": 0.55,
-  "Enrichment": 0.55,
-  "Fuel fabrication": 0.55,
-  "Power Plant": 0.4,
+  "Enrichment": 0.3,
+  "Fuel fabrication": 0.3,
+  "Power Plant": 0.3,
   "Spent Fuel / HLW": 0.7
 })
 
@@ -216,7 +224,7 @@ viewof map = {
           mutable selectedTransfer =
             md`${info.object.source} → ${info.object.recipient}`
           mutable selectedValue =
-            html`US${amountText} / year<br><span class="small">average over 2016–2021</span>`
+            html`US${amountText} / year <span class="small">average over 2016–2021</span>`
         } else {
           mutable selectedTransfer = md`No transfer selected`
           mutable selectedValue = md``
