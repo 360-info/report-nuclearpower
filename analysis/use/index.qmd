@@ -11,12 +11,7 @@ code-fold: true
 ```{r}
 #| label: setup
 library(tidyverse)
-# library(glue)
-# library(sf)
-# library(rgeoboundaries)
 library(countrycode)
-# library(lwgeom)
-# library(jsonlite)
 library(here)
 ```
 
@@ -70,7 +65,10 @@ irena_bound |>
   ungroup() |>
   # pivot out the amounts and proportions by tech type
   mutate(measure = recode(measure,
-    "generation" = "totalgen.gwh", "capacity" = "totalcap.mw")) |>
+    "generation" = "totalgen.gwh", "capacity" = "totalcap.mw")) ->
+irena_long
+
+irena_long |>
   pivot_wider(
     id_cols = c(country, year),
     names_from = c(measure, energy_type), names_sep = "_",
@@ -146,4 +144,21 @@ latest_year <- max(irena_centroids$year, na.rm = TRUE)
 irena_centroids |>
   filter(year == max(year, na.rm = TRUE)) |>
   write_csv(here("data", paste0("irena-proportions-", latest_year, ".csv")))
+```
+
+Finally, let's get some global totals:
+
+
+```{r}
+#| label: global-totals
+irena_long |>
+  group_by(measure, year, energy_type) |>
+  summarise(amount = sum(amount, na.rm = TRUE)) |>
+  mutate(prop = amount / sum(amount, na.rm = TRUE)) |>
+  pivot_wider(
+    id_cols = c(year),
+    names_from = c(measure, energy_type), names_sep = "_",
+    values_from = c(amount, prop)) |>
+  write_csv(here("data", paste0("irena-proportions-global.csv"))) ->
+irena_global
 ```

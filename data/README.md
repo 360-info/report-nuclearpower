@@ -1,8 +1,8 @@
 # `/data`
 
-## `irena-proportions.csv`
+## `irena-proportions.csv`, `irena-proportions-2022.csv`
 
-Processed [IRENASTAT](https://pxweb.irena.org/pxweb/en/IRENASTAT) data indicating the amount and proportion of energy produced, and energy capacity developed, by nuclear, renewable and non-renewable sources.
+Processed [IRENASTAT](https://pxweb.irena.org/pxweb/en/IRENASTAT) data indicating the amount and proportion of energy produced, and energy capacity developed, by nuclear, renewable and non-renewable sources. The `-[year]` variant contains only the latest year's data.
 
 Columns include:
 
@@ -15,6 +15,8 @@ Columns include:
   - `variable`: either `amount` (in either GWh for power generated or MW for capacity established) or `prop` for the proportion
   - `measure`: either `totalgen.gwh` for power generated or `totalcap.mw` for capacity established
   - `technology`: either `nuclear`, `renewable` or `nonrenewable`
+
+## `irena-proportions-global.csv`
 
 ## `irena-src-*.csv`
 
