@@ -1,14 +1,15 @@
 ---
 format: gfm
 360readme:
-  title: Title here
-  summary: One line summary here
-  repo: report-example
-  share-url: https://example.360visuals.org/example
+  title: Nuclear power
+  summary: Visualises the trade and use of nuclear energy
+  repo: report-nuclearpower
+  share-url: https://nuclearenergy.360visuals.org/trademap
   data-sources: |
     <ul>
-      <li><a href="https://example.com">Example 1</a></li>
-      <li><a href="https://example.com">Example 2</a></li>
+      <li><a href="https://data.jrc.ec.europa.eu/dataset/1cbbf606-7ca0-43a6-abce-dbd37094a092">Nuclear Trade Atlas, Europena Commission</a></li>
+      <li>Nigel Marks, Curtin University</li>
+      <li><a href="https://irena.org">International Renewable Energy Agency</a></li>
     </ul>
 ---
 
