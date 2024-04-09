@@ -17,6 +17,7 @@ a:visited {
   
   color: white;
   text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  font-size: clamp(0.5em, 2.5vw, 1em);
 
   margin-inline-end: 125px;
   
@@ -35,6 +36,7 @@ a:visited {
 #title-block-header h1 {
   text-transform: uppercase;
   font-weight: 900;
+  font-size: 200%;
   margin-block-end: 0.2em;
 }
 
@@ -45,51 +47,21 @@ a:visited {
 }
 
 #title-block-header .detail {
-  margin-block-start: 0.15em;
+  margin-block-start: 1em;
 }
 
 #title-block-header .detail p {
   font-weight: normal;
 }
 
+#title-block-header .detail h4 {
+  margin-block: 0;
+  text-transform: uppercase;
+}
+
 .small {
   font-size: 80%;
 }
-
-/* shrink header elements at lower widths */
-@media (max-width: 45em) {
-  
-  #title-block-header h1 
-  {
-    font-size: 130%;
-  }
-
-  #title-block-header p 
-  {
-    font-size: 100%;
-    font-weight: bold;
-  }
-
-  .inputForm {
-    transform: scale(0.9);
-    transform-origin: bottom left;
-  }
-}
-
-@media (max-width: 34em) {
-  
-  #title-block-header h1 
-  {
-    font-size: 120%;
-  }
-
-  #title-block-header p 
-  {
-    font-size: 80%;
-    font-weight: bold;
-  }
-}
-
 
 .embedcode {
   font-size: 60%;

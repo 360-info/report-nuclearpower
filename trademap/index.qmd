@@ -30,14 +30,14 @@ format:
   max-height: 900px
   bg-colour: white
   title: "Map: Nuclear trade"
-  repo: report-example
+  repo: report-nuclearpower
   domain: https://nuclearenergy.360visuals.org
   path: /trademap/  
   fragments:
   about: |
-    The data in this map comes from the [Nuclear Trade Atlas](https://data.jrc.ec.europa.eu/dataset/1cbbf606-7ca0-43a6-abce-dbd37094a092) dataset produced by the [European Commission's Joint  Research Centre](https://ec.europa.eu/info/departments/joint-research-centre).<br>
+    The data in this map comes from the [Nuclear Trade Atlas](https://data.jrc.ec.europa.eu/dataset/1cbbf606-7ca0-43a6-abce-dbd37094a092){target="_blank"} dataset produced by the [European Commission's Joint  Research Centre](https://ec.europa.eu/info/departments/joint-research-centre){target="_blank"}.<br>
 
-    Commodities were classified into stages of the nuclear energy lifecycle with the help of Associate Professor [Nigel Marks](https://staffportal.curtin.edu.au/staff/profile/view/nigel-marks-a3025073/) from Curtin University.<br>
+    Commodities were classified into stages of the nuclear energy lifecycle with the help of Associate Professor [Nigel Marks](https://staffportal.curtin.edu.au/staff/profile/view/nigel-marks-a3025073/){target="_blank"} from Curtin University.<br>
 
     Commodities traded in each category may (but do not necessarily) include:<br>
 
@@ -69,10 +69,67 @@ md`of nuclear power ${selectedCategory.toLowerCase()} commodities`
 :::{.detail}
 
 ```{ojs}
-mutable selectedTransfer = md`No transfer selected`
-mutable selectedValue = md``
+//| label: statsCalc
+//| output: false
 
-// md`${transfer}: ${value}`
+// these are updated by deck on arc hover
+mutable selectedSource = null
+mutable selectedRecipient = null
+mutable selectedValue = null
+
+// calculate totals for text display based on selected source and recipient
+
+sourceTotalOut = d3.sum(
+  categoryData
+    .filter(d => d.source == selectedSource)
+    .map(d => d.sum_value_usd))
+sourceTotalIn = d3.sum(
+  categoryData
+    .filter(d => d.recipient == selectedSource)
+    .map(d => d.sum_value_usd))
+
+recipientTotalOut = d3.sum(
+  categoryData
+    .filter(d => d.source == selectedRecipient)
+    .map(d => d.sum_value_usd))
+recipientTotalIn = d3.sum(
+  categoryData
+    .filter(d => d.recipient == selectedRecipient)
+    .map(d => d.sum_value_usd))
+
+// currency formatter
+money = function(x) {
+  return "US" +
+    d3.format("$.0s")(x)
+      .replace("G", "B")
+      .replace("P", "T")
+}
+
+```
+
+```{ojs}
+//| label: statsText
+
+mutable selectedTransfer = selectedSource && selectedRecipient ?
+  html`${selectedSource} → ${selectedRecipient}: ${money(selectedValue)}<br><br>` :
+  md`No transfer selected`
+
+selectedSource && selectedRecipient ?
+  md`#### Globally` :
+  md``
+
+mutable sourceTotals = selectedSource && selectedRecipient ?
+  html`<strong>${selectedSource}:</strong> ${money(sourceTotalIn)} imported, ${money(sourceTotalOut)} exported` :
+  md``
+
+mutable recipientTotals = selectedSource && selectedRecipient ?
+  html`<strong>${selectedRecipient}:</strong> ${money(recipientTotalIn)} imported, ${money(recipientTotalOut)} exported` :
+  md``
+
+selectedSource && selectedRecipient ?
+  html`<span class="small">totals over 2016–2021</span>` :
+  md``
+
 ```
 
 :::
@@ -125,7 +182,7 @@ viewof selectedCategory = Inputs.radio(
   }
 )
 
-viewof selectedCountry = Inputs.text({ placeholder: "Country name" });
+viewof selectedCountry = Inputs.text({ placeholder: "Country name" })
 
 // filter displayed data based on both category and countries
 categoryData = mergedData.filter(d =>
@@ -137,8 +194,8 @@ categoryData = mergedData.filter(d =>
 ```{ojs}
 //| label: scales
 // width and opacity are both scaled logarithmically to help mid values stand
-// out. (note / 6 to express sum_value_usd as avg. across 6 years)
-valueExtent = d3.extent(mergedData.map(d => d.sum_value_usd / 6))
+// out
+valueExtent = d3.extent(mergedData.map(d => d.sum_value_usd))
 widthScale =
   d3.scaleLinear()
   .domain(valueExtent)
@@ -184,7 +241,7 @@ transferArcs = new deck.MapboxLayer({
     d => [Number(d.lon), Number(d.lat)],
   getTargetPosition:
     d => [Number(d.lon_recipient), Number(d.lat_recipient)],
-  getWidth: d => widthScale(d.sum_value_usd / 6),
+  getWidth: d => widthScale(d.sum_value_usd),
   getTilt: d => Number(d.lon) > Number(d.lon_recipient) ? 0 : -5,
   pickable: true,
   autoHighlight: true,
@@ -224,17 +281,20 @@ viewof map = {
     transferArcs.setProps({
       onHover: (info) => {
         if (info && info.object) {
-          const amountText =
-            d3.format("$.2s")(info.object.sum_value_usd)
-              .replace("G", "B")
-              .replace("P", "T")
-          mutable selectedTransfer =
-            md`${info.object.source} → ${info.object.recipient}`
-          mutable selectedValue =
-            html`US${amountText} / year <span class="small">average over 2016–2021</span>`
+          // const amountText = 
+          //   d3.format("$.2s")(info.object.sum_value_usd)
+          //     .replace("G", "B")
+          //     .replace("P", "T")
+          mutable selectedSource = info.object.source
+          mutable selectedRecipient = info.object.recipient
+          // mutable selectedTransfer =
+          //   md`${info.object.source} → ${info.object.recipient}`
+          mutable selectedValue = info.object.sum_value_usd
+            // html`US${amountText} / year <span class="small">average over 2016–2021</span>`
         } else {
-          mutable selectedTransfer = md`No transfer selected`
-          mutable selectedValue = md``
+          mutable selectedSource = null
+          mutable selectedRecipient = null
+          mutable selectedValue = null
         }
       }
     })
