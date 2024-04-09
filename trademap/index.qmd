@@ -80,21 +80,21 @@ mutable selectedValue = null
 // calculate totals for text display based on selected source and recipient
 
 sourceTotalOut = d3.sum(
-  categoryData
-    .filter(d => d.source == selectedSource)
+  mergedData
+    .filter(d => d.category == selectedCategory && d.source == selectedSource)
     .map(d => d.sum_value_usd))
 sourceTotalIn = d3.sum(
-  categoryData
-    .filter(d => d.recipient == selectedSource)
+  mergedData
+    .filter(d => d.category == selectedCategory && d.recipient == selectedSource)
     .map(d => d.sum_value_usd))
 
 recipientTotalOut = d3.sum(
-  categoryData
-    .filter(d => d.source == selectedRecipient)
+  mergedData
+    .filter(d => d.category == selectedCategory && d.source == selectedRecipient)
     .map(d => d.sum_value_usd))
 recipientTotalIn = d3.sum(
-  categoryData
-    .filter(d => d.recipient == selectedRecipient)
+  mergedData
+    .filter(d => d.category == selectedCategory && d.recipient == selectedRecipient)
     .map(d => d.sum_value_usd))
 
 // currency formatter
