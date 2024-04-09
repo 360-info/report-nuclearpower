@@ -119,14 +119,13 @@ mergedData = allData
 ```{ojs}
 //| label: category-filter
 viewof selectedCategory = Inputs.radio(
-  Array.from(new Set(mergedData.map(d => d.category))), {
+  ["Mining", "Enrichment", "Fuel fabrication", "Power Plant", "Spent Fuel / HLW"], {
     value: "Mining",
     format: x => html`<span style="color: ${colorSchemes[x][3]}">${x}</span>`
   }
 )
 
-viewof selectedCountry = Inputs.text({ 
-  placeholder: "Country name" });
+viewof selectedCountry = Inputs.text({ placeholder: "Country name" });
 
 // filter displayed data based on both category and countries
 categoryData = mergedData.filter(d =>
@@ -141,26 +140,20 @@ categoryData = mergedData.filter(d =>
 // out. (note / 6 to express sum_value_usd as avg. across 6 years)
 valueExtent = d3.extent(mergedData.map(d => d.sum_value_usd / 6))
 widthScale =
-  d3.scaleLog()
+  d3.scaleLinear()
   .domain(valueExtent)
-  .range([0.25, 2.5])
-opacityScale =
-  d3.scaleLog()
-  .domain(valueExtent)
-  .range([
-    opacities[selectedCategory] * 0.15 * 255,
-    opacities[selectedCategory] * 255])
+  .range([0.5, 3.5])
 
 // we'll use a different colour scale for each category, taking a different lightness for source and recipient
 colorSchemes = ({
   "Mining": d3.schemeYlOrBr[9],
   "Enrichment": d3.schemeYlGn[9],
   "Fuel fabrication": d3.schemeYlGnBu[9],
-  "Power Plant": d3.schemeGreys[9],
+  "Power Plant": d3.schemePuBu[9],
   "Spent Fuel / HLW": d3.schemeRdPu[9]
 })
-sourceIndex = 7
-targetIndex = 1
+sourceIndex = 6
+targetIndex = 2
  
 opacities = ({
   "Mining": 0.55,
@@ -258,8 +251,10 @@ viewof map = {
 //| label: update-arcs
 updates = transferArcs.setProps({
   data: categoryData,
-  getSourceColor: d => [...deckColorScheme[sourceIndex], opacityScale(d.sum_value_usd)],
-  getTargetColor: d => [...deckColorScheme[targetIndex], opacityScale(d.sum_value_usd)]
+  getSourceColor: d =>
+    [...deckColorScheme[sourceIndex], opacities[selectedCategory] * 255],
+  getTargetColor: d =>
+    [...deckColorScheme[targetIndex], opacities[selectedCategory] * 255]
 })
 ```
 
